@@ -137,41 +137,56 @@
         
         showList();
         function addToList(){
-            var text = input.value;
-            if(textFilter(text)){
-                var oldData = JSON.parse(localStorage.todo);
-                var count = oldData.len;
-                count++;
-                oldData.len = count;
-                oldData[`list${count}`] = text;
-                localStorage.todo = JSON.stringify(oldData);
-                input.value = "";
-                showList();
+            if(checkAvailable()){
+                var text = input.value;
+                if(textFilter(text)){
+                    var oldData = JSON.parse(localStorage.todo);
+                    var count = oldData.len;
+                    count++;
+                    oldData.len = count;
+                    oldData[`list${count}`] = text;
+                    localStorage.todo = JSON.stringify(oldData);
+                    input.value = "";
+                    showList();
+                }
+            }
+            else{
+                localStorage.todo = JSON.stringify({"len":0});
             }
         }
         function showList(){
-            var fetchData = JSON.parse(localStorage.todo);
-            var remaining = 0;
-            ul.innerHTML = "";
-            for(key in fetchData){
-                if(key!="len"){
-                    if(fetchData[key]!=""){
-                        ul.innerHTML += `<li class="list-item white-theme" id=${key}>
-                        <span class="span-list-name">${fetchData[key]}</span>
-                        <button class="btn li-btn" onclick="deleteList('${key}')"><i class="fas fa-trash"></i></button>
-                        <button class="btn li-btn" onclick="editList('${key}')"><i class="fas fa-edit"></i></button>
-                        </li>`;
-                        remaining ++;
+            if(checkAvailable()){
+                var fetchData = JSON.parse(localStorage.todo);
+                var remaining = 0;
+                ul.innerHTML = "";
+                for(key in fetchData){
+                    if(key!="len"){
+                        if(fetchData[key]!=""){
+                            ul.innerHTML += `<li class="list-item white-theme" id=${key}>
+                            <span class="span-list-name">${fetchData[key]}</span>
+                            <button class="btn li-btn" onclick="deleteList('${key}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn li-btn" onclick="editList('${key}')"><i class="fas fa-edit"></i></button>
+                            </li>`;
+                            remaining ++;
+                        }
                     }
-                }
             }
-            document.getElementById("remaining").innerHTML = "You Have "+remaining+" Remaining Tasks To Do......";
+                document.getElementById("remaining").innerHTML = "You Have "+remaining+" Remaining Tasks To Do......";
+            }
+            else{
+                localStorage.todo = JSON.stringify({"len":0});
+            }
         }
         function clearAll(){
-            var deleteConfirm = confirm("Are you sure want to delete all?");
-            if(deleteConfirm){
-                localStorage.todo = JSON.stringify({"len":0});
-                showList();
+            if(checkAvailable()){
+                var deleteConfirm = confirm("Are you sure want to delete all?");
+                if(deleteConfirm){
+                    localStorage.todo = JSON.stringify({"len":0});
+                    showList();
+                }
+            }
+            else{
+                alert("There is nothing!");
             }
         }
         function deleteList(key){
@@ -208,6 +223,15 @@
                 return false;
             }
             
+        }
+        function checkAvailable(){
+            if(localStorage.todo){
+                return true;
+            }
+            else{
+                return false;
+            }
+
         }
     </script>
 </body>
