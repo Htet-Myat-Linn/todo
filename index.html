@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         body{
             background-color: #A5C6E1;
@@ -86,7 +87,7 @@
             margin-left: 45%;
         }
         
-        @media only screen and (max-width: 600px) {
+        @media only screen and (max-width: 800px) {
             .todo{
                 width: 90%;
                 margin: auto;
@@ -95,7 +96,7 @@
             }
             #text{
                 font-size: large;
-                width: 78%;
+                width: 78% !important;
             }
             .btn-align-inside{
                 font-size: 28px !important;
@@ -112,9 +113,9 @@
                 font-size: small;
             }
         }
-        @media only screen and (max-width: 400px) {
+        @media only screen and (max-width: 420px) {
             #text{
-                width: 70%;
+                width: 70% !important;
             }
             .btn-align-inside{
                 font-size: 25px !important;
@@ -153,7 +154,7 @@
         
         var input = document.getElementById("text");
         var ul = document.getElementById("list");
-        
+        var remaining = 0;
         showList();
         function addToList(){
             if(checkAvailable()){
@@ -166,7 +167,7 @@
                     oldData[`list${count}`] = text;
                     localStorage.todo = JSON.stringify(oldData);
                     input.value = "";
-                    showList();
+                    updateList();
                 }
             }
             else{
@@ -176,8 +177,8 @@
         function showList(){
             if(checkAvailable()){
                 var fetchData = JSON.parse(localStorage.todo);
-                var remaining = 0;
                 ul.innerHTML = "";
+                remaining =0;
                 for(key in fetchData){
                     if(key!="len"){
                         if(fetchData[key]!=""){
@@ -190,6 +191,25 @@
                         }
                     }
             }
+                document.getElementById("remaining").innerHTML = "You Have "+remaining+" Remaining Tasks To Do......";
+            }
+            else{
+                localStorage.todo = JSON.stringify({"len":0});
+            }
+        }
+        function updateList(){
+            if(checkAvailable()){
+                var fetchData = JSON.parse(localStorage.todo);
+                var key = "list"+fetchData['len'];
+                var lastItem = fetchData[key];
+                var li = document.createElement("li");
+                li.id = key;
+                li.classList.add("list-item","white-theme","animate__animated", "animate__fadeInDown");
+                li.innerHTML += `<span class="span-list-name">${fetchData[key]}</span>
+                            <button class="btn li-btn" onclick="deleteList('${key}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn li-btn" onclick="editList('${key}')"><i class="fas fa-edit"></i></button>`;
+                ul.appendChild(li);
+                remaining++;
                 document.getElementById("remaining").innerHTML = "You Have "+remaining+" Remaining Tasks To Do......";
             }
             else{
