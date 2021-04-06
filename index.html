@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
+        
         body{
             background-color: #A5C6E1;
         }
@@ -22,15 +23,21 @@
             font-family: 'Raleway', sans-serif;
 
         }
+        .input-container{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         #text{
             width: 89%;
-            margin: auto;
+            
             padding: 10px;
             height: 37px;
             border-radius: 20px;
             font-size: x-large;
             font-family: 'Raleway', sans-serif;
             font-weight: bolder;
+            border: none;
         }
         *:focus{
             outline: none;
@@ -44,8 +51,7 @@
             border: none;
         }
         .btn-align-inside{
-            font-size: 27px;
-            margin-left:10px;
+            font-size: 20px;
             
         }
         .list{
@@ -95,16 +101,15 @@
             margin-left: 45%;
         }
         
-        @media only screen and (max-width: 800px) {
+        @media only screen and (max-width: 780px) {
             .todo{
                 width: 90%;
                 margin: auto;
-                margin-left: 1px;
                 padding: 12px;
             }
             #text{
                 font-size: large;
-                width: 78% !important;
+                width: 95% ;
             }
             .btn-align-inside{
                 font-size: 28px !important;
@@ -123,7 +128,7 @@
         }
         @media only screen and (max-width: 420px) {
             #text{
-                width: 70% !important;
+                width: 85% ;
             }
             .btn-align-inside{
                 font-size: 25px !important;
@@ -131,24 +136,17 @@
                 margin-left: 15px;
             }  
         }
-        @media only screen and (max-width: 280px) {
-            #text{
-                width: 60%;
-            }
-            .btn-align-inside{
-                font-size: 25px !important;
-                font-weight: bolder;
-                margin-left: 15px;
-            }  
-        }
+       
     </style>
 </head>
 <body>
     <div class="todo">
         <h1>To Do List</h1>
         <hr><br>
-        <input type="text" id="text"  placeholder="Add To Do Task.....">
-        <button  class="btn btn-align-inside" value="Add to List" onclick="addToList()">+</button>
+        <div class="input-container">
+            <input type="text" id="text"  placeholder="Add To Do Task.....">
+            <button  class="btn btn-align-inside" value="Add to List" onclick="addToList()">+</button>
+        </div>
         <br>
         <br>
         
@@ -158,129 +156,7 @@
         <h3 id="remaining"></h3>
         <button class="btn btn-clear" onclick="clearAll()">Clear All</button>
     </div>
-    <script>
-        
-        var input = document.getElementById("text");
-        var ul = document.getElementById("list");
-        var remaining = 0;
-        showList();
-        function addToList(){
-            if(checkAvailable()){
-                var text = input.value;
-                if(textFilter(text)){
-                    var oldData = JSON.parse(localStorage.todo);
-                    var count = oldData.len;
-                    count++;
-                    oldData.len = count;
-                    oldData[`list${count}`] = text;
-                    localStorage.todo = JSON.stringify(oldData);
-                    input.value = "";
-                    updateList();
-                }
-            }
-            else{
-                localStorage.todo = JSON.stringify({"len":0});
-            }
-        }
-        function showList(){
-            if(checkAvailable()){
-                var fetchData = JSON.parse(localStorage.todo);
-                ul.innerHTML = "";
-                remaining =0;
-                for(key in fetchData){
-                    if(key!="len"){
-                        if(fetchData[key]!=""){
-                            ul.innerHTML += `<li class="list-item white-theme" id=${key}>
-                            <span class="span-list-name">${fetchData[key]}</span>
-                            <div class="button-container"><button class="btn li-btn" onclick="deleteList('${key}')"><i class="fas fa-trash"></i></button>
-                            <button class="btn li-btn" onclick="editList('${key}')"><i class="fas fa-edit"></i></button></div> 
-                            </li>`;
-                            remaining ++;
-                        }
-                    }
-            }
-                document.getElementById("remaining").innerHTML = "You Have "+remaining+" Remaining Tasks To Do......";
-            }
-            else{
-                localStorage.todo = JSON.stringify({"len":0});
-            }
-        }
-        function updateList(){
-            if(checkAvailable()){
-                var fetchData = JSON.parse(localStorage.todo);
-                var key = "list"+fetchData['len'];
-                var lastItem = fetchData[key];
-                var li = document.createElement("li");
-                li.id = key;
-                li.classList.add("list-item","white-theme","animate__animated", "animate__fadeInDown");
-                li.innerHTML += `<span class="span-list-name">${fetchData[key]}</span>
-                            <div class="button-container"><button class="btn li-btn" onclick="deleteList('${key}')"><i class="fas fa-trash"></i></button>
-                            <button class="btn li-btn" onclick="editList('${key}')"><i class="fas fa-edit"></i></button></div>`;
-                ul.appendChild(li);
-                remaining++;
-                document.getElementById("remaining").innerHTML = "You Have "+remaining+" Remaining Tasks To Do......";
-            }
-            else{
-                localStorage.todo = JSON.stringify({"len":0});
-            }
-        }
-        function clearAll(){
-            if(checkAvailable()){
-                var deleteConfirm = confirm("Are you sure want to delete all?");
-                if(deleteConfirm){
-                    localStorage.todo = JSON.stringify({"len":0});
-                    showList();
-                }
-            }
-            else{
-                alert("There is nothing!");
-            }
-        }
-        function deleteList(key){
-            var oldData = JSON.parse(localStorage.todo);
-            var deleteConfirm = confirm(`Are you sure want to delete ${oldData[key]} ?`);
-            
-            if(deleteConfirm){
-                oldData[key] = "";
-                localStorage.todo = JSON.stringify(oldData);
-                showList();
-            }  
-        }
-        function editList(key){
-            var oldData = JSON.parse(localStorage.todo);
-            var text = prompt("Enter text to edit:",oldData[key]);
-            if(textFilter(text)){
-                oldData[key] = text;
-                localStorage.todo = JSON.stringify(oldData);
-                showList();
-            }
-            
-        }
-        function textFilter(x) {
-            if(x){
-                if(x.length>=3){
-                    return x;
-                }
-                else{
-                    alert("Minimum length is 3.");
-                    return false;
-                }
-            }
-            else{
-                return false;
-            }
-            
-        }
-        function checkAvailable(){
-            if(localStorage.todo){
-                return true;
-            }
-            else{
-                return false;
-            }
-
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
 
